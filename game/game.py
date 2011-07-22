@@ -65,7 +65,7 @@ class Map:
         
         self.max_room_monsters = 3
         
-        self.fov_algo = 0
+        self.fov_algo = tcod.FOV_RESTRICTIVE
         self.fov_light_walls = True
         self.torch_radius = 10
         
@@ -80,7 +80,6 @@ class Map:
             y = tcod.random_get_int(0, room.y1+1, room.y2-1)
             
             if tcod.random_get_int(0, 0, 100) < 80:
-                print "Makin an orc..."
                 monster = Asset(x, y, 'o', 'Orc', tcod.desaturated_green, self.con)
             else:
                 monster = Asset(x, y, 'T', 'Troll', tcod.darker_green, self.con)
