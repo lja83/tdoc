@@ -165,10 +165,13 @@ class Map:
                     char = '.'
                 
                 if tcod.map_is_in_fov(self.fov_map, x, y):
-                    color = tcod.dark_yellow
+                    if char == '#':
+                        color = tcod.dark_yellow
+                    else:
+                        color = tcod.grey
                     self.tiles[x][y].explored = True
                 else:
-                    color = tcod.dark_grey
+                    color = tcod.darker_blue
                 
                 if self.tiles[x][y].explored:
                     tcod.console_put_char_ex(self.con, x, y, char, color, tcod.black)
