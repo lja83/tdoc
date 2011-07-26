@@ -171,7 +171,7 @@ class Map:
                         color = tcod.grey
                     self.tiles[x][y].explored = True
                 else:
-                    color = tcod.darker_blue
+                    color = tcod.darker_grey
                 
                 if self.tiles[x][y].explored:
                     tcod.console_put_char_ex(self.con, x, y, char, color, tcod.black)
@@ -198,11 +198,13 @@ class Game:
         
         # tcod.console_credits()
         # tcod.console_clear(0)
+        self.player_action = None
+        self.game_state = 'playing'
         while not tcod.console_is_window_closed():
             self.render_all()
             
-            exit = self.handle_keys()
-            if exit:
+            self.player_action = self.handle_keys()
+            if self.player_action == 'exit':
                 break
     
     def is_blocked(x, y):
@@ -215,14 +217,15 @@ class Game:
     
     def handle_keys(self):
         key = tcod.console_wait_for_keypress(True)
-        if key.vk in self.bindings:
-            action = self.bindings[key.vk]
-            result = action[0](*action[1])
-            if action[2]:
-                self.map.fov_recompute(self.player.x, self.player.y)
-            return result
+        if self.game_state == 'playing':
+            if key.vk in self.turn_bindings:
+                action = self.turn_bindings[key.vk]
+                result = action[0](*action[1])
+                if action[2]:
+                    self.map.fov_recompute(self.player.x, self.player.y)
+                return result
         else:
-            print key.vk
+            return 'didnt-take-turn'
     
     def bind_keys(self):
         move_up         = (self.player.move, [ 0, -1, self.map], True)
@@ -233,9 +236,9 @@ class Game:
         move_up_right   = (self.player.move, [ 1, -1, self.map], True)
         move_down_left  = (self.player.move, [-1,  1, self.map], True)
         move_down_right = (self.player.move, [ 1,  1, self.map], True)
-        quit = (lambda : True, [], False)
+        quit            = (lambda : 'exit', [], False)
         
-        self.bindings = {
+        self.turn_bindings = {
             tcod.KEY_UP: move_up,
             tcod.KEY_DOWN: move_down,
             tcod.KEY_LEFT: move_left,
